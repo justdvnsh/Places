@@ -1,6 +1,7 @@
 package com.example.places;
 
 import android.content.Context;
+import android.location.Address;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,24 +10,21 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 
 public class placesAdapter extends RecyclerView.Adapter<placesAdapter.placesViewHolder> {
 
-    private ArrayList<HashMap<String, String>> places;
+    private List<Address> places;
 
     final private ListItemOnClickListener mOnClickListener;
 
-    public void setPlaces(ArrayList<HashMap<String, String>> userPlaces) {
+    public void setPlaces(List<Address> userPlaces) {
         places = userPlaces;
         notifyDataSetChanged();
     }
 
     public interface ListItemOnClickListener {
-        void onClick(HashMap<String, String> place);
+        void onClick(Address place);
     }
 
     public placesAdapter(ListItemOnClickListener listener) {
@@ -73,8 +71,35 @@ public class placesAdapter extends RecyclerView.Adapter<placesAdapter.placesView
 
         public void bind(int position) {
 
-            HashMap<String, String> place = places.get(position);
-            mPlacesTextView.setText("Hello");
+            Address place = places.get(position);
+            String feature;
+            String thoroughFare;
+            String locality;
+            String subAdmin;
+            String admin;
+            String postalCode;
+            String country;
+
+            if (place.getThoroughfare() != null && place.getLocality() != null) {
+
+                feature = place.getFeatureName();
+                thoroughFare = place.getThoroughfare();
+                locality = place.getLocality();
+                subAdmin = place.getSubAdminArea();
+                admin = place.getAdminArea();
+                postalCode = place.getPostalCode();
+                country = place.getCountryName();
+                mPlacesTextView.setText(feature + " - " + thoroughFare + " - " + locality + " - " + subAdmin + " - " + admin + " - " + country);
+            } else {
+
+                feature = place.getFeatureName();
+                subAdmin = place.getSubAdminArea();
+                admin = place.getAdminArea();
+                postalCode = place.getPostalCode();
+                country = place.getCountryName();
+                mPlacesTextView.setText(feature + " - " + subAdmin + " - " + admin + " - " + country);
+
+            }
 
         }
 
@@ -82,7 +107,7 @@ public class placesAdapter extends RecyclerView.Adapter<placesAdapter.placesView
         public void onClick(View view) {
 
             int clickedPosition = getAdapterPosition();
-            HashMap<String, String> place = places.get(clickedPosition);
+            Address place = places.get(clickedPosition);
             mOnClickListener.onClick(place);
 
         }

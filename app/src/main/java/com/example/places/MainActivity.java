@@ -1,6 +1,7 @@
 package com.example.places;
 
 import android.content.Intent;
+import android.location.Address;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -20,18 +21,17 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements placesAdapter.ListItemOnClickListener {
 
     /* initializaiton of the variables */
     private RecyclerView mRecyclerView;
-    private placesAdapter mAdapter;
-    private ArrayList<HashMap<String, String>> places;
+    protected static placesAdapter mAdapter;
+    protected static List<Address> places = new ArrayList<>();
     TextView mInfoTextView;
     ProgressBar mProgressBar;
 
-    /* getting & setting the user location */
-    public void setLocations() {}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +62,6 @@ public class MainActivity extends AppCompatActivity implements placesAdapter.Lis
         mRecyclerView.setLayoutManager(layoutManager);
         mAdapter = new placesAdapter(this);
         mRecyclerView.setAdapter(mAdapter);
-        setLocations();
     }
 
     @Override
@@ -89,7 +88,12 @@ public class MainActivity extends AppCompatActivity implements placesAdapter.Lis
 
     // onClick method for each item in the recycker view ( mostly places )
     @Override
-    public void onClick(HashMap<String, String> place) {
-
+    public void onClick(Address place) {
+        Intent intent = new Intent(MainActivity.this, MapsActivity.class);
+        double latitude = place.getLatitude();
+        double longitude = place.getLongitude();
+        intent.putExtra("lat", latitude);
+        intent.putExtra("long", longitude);
+        startActivity(intent);
     }
 }
