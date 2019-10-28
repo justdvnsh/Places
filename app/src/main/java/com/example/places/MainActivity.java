@@ -8,12 +8,28 @@ import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Adapter;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public class MainActivity extends AppCompatActivity implements placesAdapter.ListItemOnClickListener {
+
+    private RecyclerView mRecyclerView;
+    private placesAdapter mAdapter;
+    private ArrayList<HashMap<String, String>> places;
+    TextView mInfoTextView;
+    ProgressBar mProgressBar;
+
+    public void setLocations() {}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +46,17 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        mInfoTextView = (TextView) findViewById(R.id.info);
+        mProgressBar = (ProgressBar) findViewById(R.id.progress);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL, false);
+        mRecyclerView = findViewById(R.id.recycle);
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setLayoutManager(layoutManager);
+        mAdapter = new placesAdapter(this);
+        mRecyclerView.setAdapter(mAdapter);
+        setLocations();
     }
 
     @Override
@@ -52,5 +79,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(HashMap<String, String> place) {
+
     }
 }
