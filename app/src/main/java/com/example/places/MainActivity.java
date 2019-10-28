@@ -23,12 +23,14 @@ import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity implements placesAdapter.ListItemOnClickListener {
 
+    /* initializaiton of the variables */
     private RecyclerView mRecyclerView;
     private placesAdapter mAdapter;
     private ArrayList<HashMap<String, String>> places;
     TextView mInfoTextView;
     ProgressBar mProgressBar;
 
+    /* getting & setting the user location */
     public void setLocations() {}
 
     @Override
@@ -38,10 +40,13 @@ public class MainActivity extends AppCompatActivity implements placesAdapter.Lis
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // the floating action button to open Maps intent
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                // Maps Activity
                 Intent intent = new Intent(MainActivity.this, MapsActivity.class);
                 startActivity(intent);
             }
@@ -50,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements placesAdapter.Lis
         mInfoTextView = (TextView) findViewById(R.id.info);
         mProgressBar = (ProgressBar) findViewById(R.id.progress);
 
+        // setting the layout and adapter for the recycler view.
         LinearLayoutManager layoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL, false);
         mRecyclerView = findViewById(R.id.recycle);
         mRecyclerView.setHasFixedSize(true);
@@ -81,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements placesAdapter.Lis
         return super.onOptionsItemSelected(item);
     }
 
+    // onClick method for each item in the recycker view ( mostly places )
     @Override
     public void onClick(HashMap<String, String> place) {
 

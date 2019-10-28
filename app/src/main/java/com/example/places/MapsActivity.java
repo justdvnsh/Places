@@ -15,6 +15,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ProgressBar;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -53,6 +54,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
     }
 
 
@@ -69,6 +71,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
 
         mMap = googleMap;
+        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         locationListener = new LocationListener() {
             @Override
@@ -89,6 +92,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     if (addresses != null && addresses.size() > 0) {
                         Log.i("Location", addresses.get(0).toString());
+
                     }
 
                 } catch (Exception e) {
@@ -115,15 +119,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         } else {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 10, locationListener);
 
             Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-            mMap.clear();
-            // Add a marker in Sydney and move the camera
-            LatLng userLocation = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(userLocation).title("You are here"));
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 10));
+
+            if ( lastKnownLocation != null ) {
+                mMap.clear();
+                mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                LatLng userLocation = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
+                mMap.addMarker(new MarkerOptions().position(userLocation).title(String.valueOf(lastKnownLocation.getLatitude() + " " + String.valueOf(lastKnownLocation.getAltitude()))));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 10));
+            } else {
+
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 120, 100, locationListener);
+
+            }
         }
 
     }
