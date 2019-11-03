@@ -9,7 +9,7 @@ import androidx.annotation.Nullable;
 public class placesDbHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "places.db";
-    public static final int DATABASE_VERSION = 3;
+    public static final int DATABASE_VERSION = 4;
 
     public placesDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -31,7 +31,7 @@ public class placesDbHelper extends SQLiteOpenHelper {
                         placesContract.placesEntry.COLUMN_POSTAL_CODE + " TEXT NOT NULL," +
                         placesContract.placesEntry.COLUMN_LATITUDE + " TEXT NOT NULL," +
                         placesContract.placesEntry.COLUMN_LONGITUDE + " TEXT NOT NULL," +
-                        " UNIQUE ("+ placesContract.placesEntry.COLUMN_LATITUDE + ", " + placesContract.placesEntry.COLUMN_LONGITUDE  + ") ON CONFLICT REPLACE);";
+                        " UNIQUE ("+ placesContract.placesEntry.COLUMN_LATITUDE + ", " + placesContract.placesEntry.COLUMN_LONGITUDE  + ") ON CONFLICT REPLACE );";
 
         sqLiteDatabase.execSQL(SQL_CREATE_PLACES_TABLE);
 

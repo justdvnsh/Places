@@ -85,6 +85,9 @@ public class placesAdapter extends RecyclerView.Adapter<placesAdapter.placesView
             String feature = mCursor.getString(mCursor.getColumnIndex(placesContract.placesEntry.COLUMN_FEATURE));
             String admin = mCursor.getString(mCursor.getColumnIndex(placesContract.placesEntry.COLUMN_ADMIN));
             String country = mCursor.getString(mCursor.getColumnIndex(placesContract.placesEntry.COLUMN_COUNTRY_NAME));
+            long id = mCursor.getLong(mCursor.getColumnIndex(placesContract.placesEntry._ID));
+
+            itemView.setTag(id);
 
             mPlacesTextView.setText(feature + admin + country);
 

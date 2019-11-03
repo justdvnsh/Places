@@ -11,8 +11,10 @@ import com.example.places.data.placesDbHelper;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -85,6 +87,22 @@ public class MainActivity extends AppCompatActivity implements placesAdapter.Lis
 
         mAdapter = new placesAdapter(this, cursor);
         mRecyclerView.setAdapter(mAdapter);
+
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+
+                long id = (long) viewHolder.itemView.getTag();
+                removePlace(id);
+                mAdapter.swapCursor(getAllPlaces());
+
+            }
+        }).attachToRecyclerView(mRecyclerView);
     }
 
     @Override
@@ -107,6 +125,11 @@ public class MainActivity extends AppCompatActivity implements placesAdapter.Lis
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public boolean removePlace(long id) {
+        return mDb.delete(placesContract.placesEntry.TABLE_NAME,
+                placesContract.placesEntry._ID + "=" + id, null) > 0;
     }
 
     // onClick method for each item in the recycker view ( mostly places )
