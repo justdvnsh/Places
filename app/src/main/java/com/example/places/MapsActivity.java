@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -21,6 +22,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.places.R;
+import com.example.places.data.placesContract;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -37,6 +39,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     LocationManager locationManager;
     LocationListener locationListener;
+
+    private long addNewPlace(List<Address> addresses) {
+        Address address = addresses.get(0);
+        String feature = address.getFeatureName();
+        String admin = address.getAdminArea();
+        String subAdmin = address.getSubAdminArea();
+        String locality = address.getLocality();
+        String thoroughFare = address.getThoroughfare();
+        String country = address.getCountryName();
+        String postalCode = address.getPostalCode();
+        String latitude = String.valueOf(address.getLatitude());
+        String longitude = String.valueOf(address.getLongitude());
+
+        ContentValues cv = new ContentValues();
+        cv.put(placesContract.placesEntry.COLUMN_FEATURE, feature);
+        cv.put(placesContract.placesEntry.COLUMN_ADMIN, admin);
+        cv.put(placesContract.placesEntry.COLUMN_SUB_ADMIN, subAdmin);
+        cv.put(placesContract.placesEntry.COLUMN_LOCALITY, locality);
+        cv.put(placesContract.placesEntry.COLUMN_THOROUGHFARE, thoroughFare);
+        cv.put(placesContract.placesEntry.COLUMN_COUNTRY_NAME, country);
+        cv.put(placesContract.placesEntry.COLUMN_POSTAL_CODE, postalCode);
+        cv.put(placesContract.placesEntry.COLUMN_LATITUDE, latitude);
+        cv.put(placesContract.placesEntry.COLUMN_LONGITUDE, longitude);
+
+        return MainActivity.mDb.insert(placesContract.placesEntry.TABLE_NAME, null, cv);
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -84,9 +112,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if ( addresses != null && addresses.size() > 0 ) {
 
                 Log.i("Address", addresses.get(0).toString());
-                MainActivity.places.add(addresses.get(0));
-                MainActivity.mAdapter.setPlaces(MainActivity.places);
-                MainActivity.mAdapter.notifyDataSetChanged();
+                addNewPlace(addresses);
+                MainActivity.mAdapter.swapCursor(MainActivity.getAllPlaces());
                 Toast.makeText(this, "Location Saved" , Toast.LENGTH_SHORT).show();
             }
 
@@ -133,11 +160,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Log.i("location", location.toString());
 
                     LatLng latlngLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                    getAddress(latlngLocation);
                     centerMapLocation(latlngLocation);
-                    if (MainActivity.places.size() == 0) {
-                        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                        getAddress(latLng);
-                    }
 
                 }
 
@@ -164,7 +188,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             } else {
 
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 120, 100, locationListener);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
 
                 Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 if (lastKnownLocation != null) {

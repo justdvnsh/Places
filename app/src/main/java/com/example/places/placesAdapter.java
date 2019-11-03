@@ -1,6 +1,7 @@
 package com.example.places;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.location.Address;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,25 +11,23 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.places.data.placesContract;
+
 import java.util.List;
 
 public class placesAdapter extends RecyclerView.Adapter<placesAdapter.placesViewHolder> {
 
-    private List<Address> places;
+    private Cursor mCursor;
 
     final private ListItemOnClickListener mOnClickListener;
-
-    public void setPlaces(List<Address> userPlaces) {
-        places = userPlaces;
-        notifyDataSetChanged();
-    }
 
     public interface ListItemOnClickListener {
         void onClick(Address place);
     }
 
-    public placesAdapter(ListItemOnClickListener listener) {
+    public placesAdapter(ListItemOnClickListener listener, Cursor cursor) {
         mOnClickListener = listener;
+        mCursor = cursor;
     }
 
     @NonNull
@@ -54,9 +53,17 @@ public class placesAdapter extends RecyclerView.Adapter<placesAdapter.placesView
 
     @Override
     public int getItemCount() {
-        if ( null == places ) return 0;
-        return places.size();
+        return mCursor.getCount();
     }
+
+    public void swapCursor(Cursor newCursor) {
+        if (mCursor != null) mCursor.close();
+        mCursor = newCursor;
+        if (newCursor != null) {
+            this.notifyDataSetChanged();
+        }
+    }
+
 
     public class placesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -71,35 +78,15 @@ public class placesAdapter extends RecyclerView.Adapter<placesAdapter.placesView
 
         public void bind(int position) {
 
-            Address place = places.get(position);
-            String feature;
-            String thoroughFare;
-            String locality;
-            String subAdmin;
-            String admin;
-            String postalCode;
-            String country;
-
-            if (place.getThoroughfare() != null && place.getLocality() != null) {
-
-                feature = place.getFeatureName();
-                thoroughFare = place.getThoroughfare();
-                locality = place.getLocality();
-                subAdmin = place.getSubAdminArea();
-                admin = place.getAdminArea();
-                postalCode = place.getPostalCode();
-                country = place.getCountryName();
-                mPlacesTextView.setText(feature + " - " + thoroughFare + " - " + locality + " - " + subAdmin + " - " + admin + " - " + country);
-            } else {
-
-                feature = place.getFeatureName();
-                subAdmin = place.getSubAdminArea();
-                admin = place.getAdminArea();
-                postalCode = place.getPostalCode();
-                country = place.getCountryName();
-                mPlacesTextView.setText(feature + " - " + subAdmin + " - " + admin + " - " + country);
-
+            if (!mCursor.moveToPosition(position)) {
+                return ;
             }
+
+            String feature = mCursor.getString(mCursor.getColumnIndex(placesContract.placesEntry.COLUMN_FEATURE));
+            String admin = mCursor.getString(mCursor.getColumnIndex(placesContract.placesEntry.COLUMN_ADMIN));
+            String country = mCursor.getString(mCursor.getColumnIndex(placesContract.placesEntry.COLUMN_COUNTRY_NAME));
+
+            mPlacesTextView.setText(feature + admin + country);
 
         }
 
@@ -107,8 +94,8 @@ public class placesAdapter extends RecyclerView.Adapter<placesAdapter.placesView
         public void onClick(View view) {
 
             int clickedPosition = getAdapterPosition();
-            Address place = places.get(clickedPosition);
-            mOnClickListener.onClick(place);
+//            Address place = places.get(clickedPosition);
+//            mOnClickListener.onClick(place);
 
         }
     }

@@ -1,9 +1,13 @@
 package com.example.places;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.location.Address;
 import android.os.Bundle;
 
+import com.example.places.data.placesContract;
+import com.example.places.data.placesDbHelper;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -28,9 +32,23 @@ public class MainActivity extends AppCompatActivity implements placesAdapter.Lis
     /* initializaiton of the variables */
     private RecyclerView mRecyclerView;
     protected static placesAdapter mAdapter;
-    protected static List<Address> places = new ArrayList<>();
     TextView mInfoTextView;
     ProgressBar mProgressBar;
+    protected static SQLiteDatabase mDb;
+
+    protected static Cursor getAllPlaces() {
+
+        return mDb.query(
+                placesContract.placesEntry.TABLE_NAME,
+                null,
+                null,
+                null,
+                null,
+                null,
+                placesContract.placesEntry.COLUMN_DATE
+        );
+
+    }
 
 
     @Override
@@ -60,7 +78,12 @@ public class MainActivity extends AppCompatActivity implements placesAdapter.Lis
         mRecyclerView = findViewById(R.id.recycle);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(layoutManager);
-        mAdapter = new placesAdapter(this);
+
+        placesDbHelper dbHelper = new placesDbHelper(this);
+        mDb = dbHelper.getWritableDatabase();
+        Cursor cursor = getAllPlaces();
+
+        mAdapter = new placesAdapter(this, cursor);
         mRecyclerView.setAdapter(mAdapter);
     }
 
@@ -89,11 +112,11 @@ public class MainActivity extends AppCompatActivity implements placesAdapter.Lis
     // onClick method for each item in the recycker view ( mostly places )
     @Override
     public void onClick(Address place) {
-        Intent intent = new Intent(MainActivity.this, MapsActivity.class);
-        double latitude = place.getLatitude();
-        double longitude = place.getLongitude();
-        intent.putExtra("lat", latitude);
-        intent.putExtra("long", longitude);
-        startActivity(intent);
+//        Intent intent = new Intent(MainActivity.this, MapsActivity.class);
+//        double latitude = place.getLatitude();
+//        double longitude = place.getLongitude();
+//        intent.putExtra("lat", latitude);
+//        intent.putExtra("long", longitude);
+//        startActivity(intent);
     }
 }
